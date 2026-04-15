@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCB Unboxing Tracker</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const checklistData = {
+            core: {
+                title: "PART 1: 22 CORE PCB MODULES",
+                description: "Theory + MCQ + PYQ",
+                subjects: [
+                    {
+                        name: "Physics (6 Books)",
+                        items: ["Physics Mod 1", "Physics Mod 2", "Physics Mod 3", "Physics Mod 4", "Physics Mod 5", "Physics Mod 6"]
+                    },
+                    {
+                        name: "Chemistry (6 Books)",
+                        items: ["Chemistry Mod 1", "Chemistry Mod 2", "Chemistry Mod 3", "Chemistry Mod 4", "Chemistry Mod 5", "Chemistry Mod 6"]
+                    },
+                    {
+                        name: "Biology (10 Books)",
+                        items: ["Biology Mod 1", "Biology Mod 2", "Biology Mod 3", "Biology Mod 4", "Biology Mod 5", "Biology Mod 6", "Biology Mod 7", "Biology Mod 8", "Biology Mod 9", "Biology Mod 10"]
+                    }
+                ]
+            },
+            boosters: {
+                title: "PART 2: 24 ADDITIONAL RANK BOOSTER BOOKS",
+                description: "Extra Practice & Reference",
+                subjects: [
+                    {
+                        name: "Physics Rank Boosters (9)",
+                        items: ["Mod Solution (Part 1)", "Mod Solution (Part 2)", "Experimental Question Book", "Physics Race", "Physics NCR", "Physics Handbook", "Physics Express", "Physics Extra Edge", "Physics At a Glance"]
+                    },
+                    {
+                        name: "Chemistry Rank Boosters (7)",
+                        items: ["Chemistry NCR (Part 1)", "Chemistry NCR (Part 2)", "Experimental Question Book", "Chemistry Handbook", "Chemistry Extra Edge", "Chemistry Race", "Chemistry At a Glance"]
+                    },
+                    {
+                        name: "Biology Rank Boosters (8)",
+                        items: ["Practical Question Bank", "Biology NCR (11th)", "Biology NCR (12th)", "Biology Race", "Biology Extra Edge", "Biology At a Glance", "Bio-Fast Track 2.0", "10 Yrs NEET Papers + Sol."]
+                    }
+                ]
+            }
+        };
+
+        function App() {
+            // LOAD PROGRESS FROM LOCALSTORAGE
+            const [checkedItems, setCheckedItems] = useState(() => {
+                const saved = localStorage.getItem('pcb_progress');
+                return saved ? new Set(JSON.parse(saved)) : new Set();
+            });
+
+            const totalBooks = 46;
+
+            // SAVE PROGRESS TO LOCALSTORAGE
+            useEffect(() => {
+                localStorage.setItem('pcb_progress', JSON.stringify([...checkedItems]));
+            }, [checkedItems]);
+
+            const toggleCheck = (item) => {
+                const newChecked = new Set(checkedItems);
+                if (newChecked.has(item)) {
+                    newChecked.delete(item);
+                } else {
+                    newChecked.add(item);
+                }
+                setCheckedItems(newChecked);
+            };
+
+            const progress = Math.round((checkedItems.size / totalBooks) * 100);
+
+            const renderSubject = (subject) => (
+                <div key={subject.name} className="mb-6 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-bold text-gray-800 border-b pb-2 mb-3">{subject.name}</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                        {subject.items.map((item) => (
+                            <label 
+                                key={item} 
+                                className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 border ${checkedItems.has(item) ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}`}
+                            >
+                                <input
+                                    type="checkbox"
+                                    className="w-5 h-5 text-green-600 rounded border-gray-300 focus:ring-green-500 cursor-pointer"
+                                    checked={checkedItems.has(item)}
+                                    onChange={() => toggleCheck(item)}
+                                />
+                                <span className={`ml-3 text-sm font-medium ${checkedItems.has(item) ? 'text-green-800 line-through' : 'text-gray-700'}`}>
+                                    {item}
+                                </span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="bg-blue-600 rounded-t-2xl p-6 text-white text-center shadow-md">
+                            <h1 className="text-3xl font-extrabold tracking-tight mb-2">PCB Parcel Unboxing</h1>
+                            <p className="text-blue-100 text-lg">Total: 46 Books | 22 Core + 24 Rank Boosters</p>
+                        </div>
+
+                        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-4 shadow-sm rounded-b-2xl mb-8">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-sm font-bold text-gray-700">Unboxing Progress</span>
+                                <span className="text-sm font-bold text-blue-600">{checkedItems.size} / {totalBooks} Books</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div className="bg-blue-600 h-3 rounded-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                            </div>
+                            {progress === 100 && (
+                                <div className="mt-3 p-2 bg-green-100 text-green-800 text-center rounded-lg font-bold">Done! All books verified.</div>
+                            )}
+                        </div>
+
+                        <div className="space-y-8">
+                            <section>
+                                <h2 className="text-2xl font-black text-gray-900 mb-4">{checklistData.core.title}</h2>
+                                {checklistData.core.subjects.map(renderSubject)}
+                            </section>
+                            <section>
+                                <h2 className="text-2xl font-black text-gray-900 mb-4">{checklistData.boosters.title}</h2>
+                                {checklistData.boosters.subjects.map(renderSubject)}
+                            </section>
+                        </div>
+
+                        <div className="mt-8 text-center text-gray-500 text-sm pb-8">
+                            <button 
+                                onClick={() => { if(confirm("Reset all checks?")) setCheckedItems(new Set()); }}
+                                className="mt-4 px-4 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg font-medium"
+                            >
+                                Reset Checklist
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
